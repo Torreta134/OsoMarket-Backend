@@ -1,0 +1,51 @@
+### 1. Registrar un nuevo usuario
+# Esto insertará un dato en la tabla "users" en Neon.
+# La contraseña se hasheará automáticamente en el servidor.
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+  "name": "Benjamin",
+  "email": "benjamin@gmail.com",
+  "password": "mi_password_seguro_123"
+}
+
+> {%
+    // Guarda el token automáticamente para las siguientes peticiones
+    client.global.set("auth_token", response.body.token);
+%}
+
+### 2. Iniciar sesión (Login)
+# Verifica el email y el hash de la contraseña.
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "benjamin@gmail.com",
+  "password": "mi_password_seguro_123"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+%}
+
+### 3. Crear un programa (Requiere Token)
+# Esto insertará un dato en la tabla "programs" en Neon.
+POST http://localhost:8080/programs
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "name": "Manejo de Backend con Kotlin",
+  "description": "Curso completo de Ktor, Exposed y PostgreSQL en Neon.",
+  "price": 150000
+}
+
+### 4. Consultar todos los programas
+# Trae la lista completa de la tabla "programs".
+GET http://localhost:8080/programs
+
+### 5. Eliminar un programa (Requiere Token)
+# Reemplaza el '1' por el ID que quieras borrar.
+DELETE http://localhost:8080/programs/1
+Authorization: Bearer {{auth_token}}

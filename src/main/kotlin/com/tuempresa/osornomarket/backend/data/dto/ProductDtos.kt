@@ -9,6 +9,7 @@ data class ProductDto(
     val brand: String,
     val description: String,
     val price: Long,
+    val type: String,
     val sellerId: String,
     val imageUrl: String,
     val condition: String
@@ -20,7 +21,7 @@ data class CreateProductRequest(
     val brand: String,
     val description: String,
     val price: Long,
-    val sellerId: String,
+    val type: String,
     val imageUrl: String,
     val condition: String
 )

@@ -21,6 +21,7 @@ class AuthService(
                 id = 0,
                 name = req.name,
                 email = req.email,
+                rut = req.rut,
                 passwordHash = passwordHash
             )
         )

@@ -26,6 +26,7 @@ class UserRepository : UserRepositoryContract {
         UsersTable.insert {
             it[name] = user.name
             it[email] = user.email
+            it[rut] = user.rut
             it[password] = user.passwordHash
         } get UsersTable.id
     }

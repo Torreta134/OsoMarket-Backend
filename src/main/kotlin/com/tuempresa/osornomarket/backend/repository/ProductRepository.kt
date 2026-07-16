@@ -26,6 +26,7 @@ class ProductRepository : ProductRepositoryContract {
             it[brand] = product.brand
             it[description] = product.description
             it[price] = product.price
+            it[type] = product.type
             it[sellerId] = product.sellerId
             it[imageUrl] = product.imageUrl
             it[condition] = product.condition
@@ -38,6 +39,7 @@ class ProductRepository : ProductRepositoryContract {
             it[brand] = product.brand
             it[description] = product.description
             it[price] = product.price
+            it[type] = product.type
             it[sellerId] = product.sellerId
             it[imageUrl] = product.imageUrl
             it[condition] = product.condition

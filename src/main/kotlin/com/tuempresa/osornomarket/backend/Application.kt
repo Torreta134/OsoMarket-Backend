@@ -1,4 +1,4 @@
-package com.tuempresa.osornomarket.backend
+    package com.tuempresa.osornomarket.backend
 
 import com.tuempresa.osornomarket.backend.data.database.ProductsTable
 import com.tuempresa.osornomarket.backend.data.database.UsersTable
@@ -87,7 +87,7 @@ fun Application.initDatabase(): HikariDataSource {
     Database.connect(dataSource)
 
     transaction {
-        SchemaUtils.create(UsersTable, ProductsTable)
+        SchemaUtils.createMissingTablesAndColumns(UsersTable, ProductsTable)
     }
     
     return dataSource

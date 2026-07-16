@@ -9,6 +9,8 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.auth.jwt.JWTPrincipal
+import com.tuempresa.osornomarket.backend.service.UnauthorizedException
 
 fun Route.productRoutes(productService: ProductService) {
 
@@ -37,12 +39,26 @@ fun Route.productRoutes(productService: ProductService) {
         authenticate("auth-jwt") {
             
             post {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.payload?.getClaim("id")?.asInt()?.toString()
+                if (userId == null) {
+                    call.respond(HttpStatusCode.Unauthorized, "No autorizado")
+                    return@post
+                }
+                
                 val req = call.receive<CreateProductRequest>()
-                val id = productService.createProduct(req)
+                val id = productService.createProduct(req, userId)
                 call.respond(HttpStatusCode.Created, mapOf("id" to id))
             }
 
             put("/{id}") {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.payload?.getClaim("id")?.asInt()?.toString()
+                if (userId == null) {
+                    call.respond(HttpStatusCode.Unauthorized, "No autorizado")
+                    return@put
+                }
+                
                 val id = call.parameters["id"]?.toIntOrNull()
                 if (id == null) {
                     call.respond(HttpStatusCode.BadRequest, "ID inválido")
@@ -50,24 +66,35 @@ fun Route.productRoutes(productService: ProductService) {
                 }
                 try {
                     val req = call.receive<CreateProductRequest>()
-                    productService.updateProduct(id, req)
-                    call.respond(HttpStatusCode.OK, "Producta actualizado")
+                    productService.updateProduct(id, req, userId)
+                    call.respond(HttpStatusCode.OK, "Producto actualizado")
                 } catch (e: NotFoundException) {
                     call.respond(HttpStatusCode.NotFound, mapOf("error" to e.message))
+                } catch (e: UnauthorizedException) {
+                    call.respond(HttpStatusCode.Forbidden, mapOf("error" to e.message))
                 }
             }
 
             delete("/{id}") {
+                val principal = call.principal<JWTPrincipal>()
+                val userId = principal?.payload?.getClaim("id")?.asInt()?.toString()
+                if (userId == null) {
+                    call.respond(HttpStatusCode.Unauthorized, "No autorizado")
+                    return@delete
+                }
+                
                 val id = call.parameters["id"]?.toIntOrNull()
                 if (id == null) {
                     call.respond(HttpStatusCode.BadRequest, "ID inválido")
                     return@delete
                 }
                 try {
-                    productService.deleteProduct(id)
-                    call.respond(HttpStatusCode.OK, "Producta eliminado")
+                    productService.deleteProduct(id, userId)
+                    call.respond(HttpStatusCode.OK, "Producto eliminado")
                 } catch (e: NotFoundException) {
                     call.respond(HttpStatusCode.NotFound, mapOf("error" to e.message))
+                } catch (e: UnauthorizedException) {
+                    call.respond(HttpStatusCode.Forbidden, mapOf("error" to e.message))
                 }
             }
         }

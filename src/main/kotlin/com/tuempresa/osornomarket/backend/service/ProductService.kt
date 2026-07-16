@@ -17,40 +17,43 @@ class ProductService(private val repository: ProductRepositoryContract) {
         return product.toDto()
     }
 
-    suspend fun createProduct(req: CreateProductRequest): Int {
+    suspend fun createProduct(req: CreateProductRequest, sellerId: String): Int {
         val product = Product(
             id = 0,
             name = req.name,
             brand = req.brand,
             description = req.description,
             price = req.price,
-            sellerId = req.sellerId,
+            type = req.type,
+            sellerId = sellerId,
             imageUrl = req.imageUrl,
             condition = req.condition
         )
         return repository.create(product)
     }
 
-    suspend fun updateProduct(id: Int, req: CreateProductRequest) {
+    suspend fun updateProduct(id: Int, req: CreateProductRequest, sellerId: String) {
+        val existing = repository.getById(id) ?: throw NotFoundException("Producto no encontrado")
+        if (existing.sellerId != sellerId) throw UnauthorizedException("No tienes permiso para editar este producto")
+        
         val product = Product(
             id = id,
             name = req.name,
             brand = req.brand,
             description = req.description,
             price = req.price,
-            sellerId = req.sellerId,
+            type = req.type,
+            sellerId = sellerId,
             imageUrl = req.imageUrl,
             condition = req.condition
         )
-        if (!repository.update(id, product)) {
-            throw NotFoundException("No se pudo actualizar: Producta no encontrado")
-        }
+        repository.update(id, product)
     }
 
-    suspend fun deleteProduct(id: Int) {
-        if (!repository.delete(id)) {
-            throw NotFoundException("No se pudo eliminar: Producta no encontrado")
-        }
+    suspend fun deleteProduct(id: Int, sellerId: String) {
+        val existing = repository.getById(id) ?: throw NotFoundException("Producto no encontrado")
+        if (existing.sellerId != sellerId) throw UnauthorizedException("No tienes permiso para eliminar este producto")
+        repository.delete(id)
     }
 }
 

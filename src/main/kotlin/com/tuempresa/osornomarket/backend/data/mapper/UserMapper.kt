@@ -9,11 +9,13 @@ fun ResultRow.toDomainUser() = User(
     id = this[UsersTable.id],
     name = this[UsersTable.name],
     email = this[UsersTable.email],
+    rut = this[UsersTable.rut],
     passwordHash = this[UsersTable.password]
 )
 
 fun User.toDto() = UserDto(
     id = id,
     name = name,
-    email = email
+    email = email,
+    rut = rut
 )

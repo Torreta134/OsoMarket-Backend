@@ -8,6 +8,7 @@ object ProductsTable : Table("products") {
     val brand = varchar("brand", 100)
     val description = text("description")
     val price = long("price")
+    val type = varchar("type", 100).default("General")
     val sellerId = varchar("seller_id", 100)
     val imageUrl = text("image_url")
     val condition = varchar("condition", 50)
